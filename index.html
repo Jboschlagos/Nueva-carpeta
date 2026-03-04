@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JS Think — Aprende a pensar en JavaScript</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #0d1117;
+        color: #c9d1d9;
+        font-family: "Segoe UI", sans-serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      #header {
+        background: #161b22;
+        border-bottom: 1px solid #30363d;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+      #header h1 {
+        font-size: 17px;
+        color: #f0f6fc;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #header h1 span.badge {
+        background: #21262d;
+        color: #8b949e;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        border: 1px solid #30363d;
+        font-weight: 400;
+      }
+      #progress-bar-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #progress-text {
+        font-size: 12px;
+        color: #8b949e;
+      }
+      #progress-bar {
+        width: 100px;
+        height: 6px;
+        background: #21262d;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      #progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #238636, #2ea043);
+        border-radius: 3px;
+        transition: width 0.4s;
+        width: 0%;
+      }
+      #main {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+      #sidebar {
+        width: 210px;
+        background: #161b22;
+        border-right: 1px solid #30363d;
+        overflow-y: auto;
+        flex-shrink: 0;
+      }
+      #content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .level-label {
+        padding: 10px 14px 4px;
+        font-size: 10px;
+        color: #8b949e;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .challenge-item {
+        padding: 7px 14px 7px 20px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border-left: 2px solid transparent;
+        color: #8b949e;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .challenge-item:hover {
+        background: #1c2128;
+      }
+      .challenge-item.active {
+        background: #1f2937;
+        border-left-color: #58a6ff;
+        color: #f0f6fc;
+      }
+      .challenge-item.done {
+        color: #2ea043;
+      }
+      #challenge-header {
+        background: #161b22;
+        border-bottom: 1px solid #30363d;
+        padding: 14px 18px;
+        flex-shrink: 0;
+      }
+      #challenge-level-badge {
+        background: #1f2937;
+        color: #58a6ff;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        border: 1px solid #30363d;
+        display: inline-block;
+        margin-bottom: 6px;
+      }
+      #challenge-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #f0f6fc;
+        margin-bottom: 5px;
+      }
+      #challenge-desc {
+        font-size: 13px;
+        color: #8b949e;
+        line-height: 1.5;
+      }
+      #hint-btns {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .hint-btn {
+        background: transparent;
+        border: 1px solid #30363d;
+        padding: 4px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        color: #f0b429;
+      }
+      .hint-btn.secondary {
+        color: #8b949e;
+      }
+      #hint-box {
+        margin-top: 10px;
+        background: #2d2a00;
+        border: 1px solid #5a4500;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: #f0b429;
+        display: none;
+      }
+      #example-box {
+        margin-top: 10px;
+        background: #0d2137;
+        border: 1px solid #1f4e7a;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 12px;
+        color: #79c0ff;
+        font-family: monospace;
+        white-space: pre;
+        display: none;
+        overflow-x: auto;
+      }
+      #editor-area {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+      #editor-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #30363d;
+      }
+      #editor-bar {
+        background: #1c2128;
+        padding: 6px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #30363d;
+        flex-shrink: 0;
+      }
+      #editor-bar span {
+        font-size: 12px;
+        color: #8b949e;
+      }
+      #editor-actions {
+        display: flex;
+        gap: 8px;
+      }
+      #code-editor {
+        flex: 1;
+        background: #0d1117;
+        color: #c9d1d9;
+        border: none;
+        outline: none;
+        padding: 14px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        resize: none;
+        tab-size: 2;
+      }
+      .btn-run {
+        background: #1f4e2a;
+        border: 1px solid #238636;
+        color: #7ee787;
+        padding: 4px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .btn-ai {
+        background: #1a3a5c;
+        border: 1px solid #1f6feb;
+        color: #79c0ff;
+        padding: 4px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      #right-panel {
+        width: 320px;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+      }
+      #console-wrap {
+        flex: 0 0 auto;
+        max-height: 38%;
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1px solid #30363d;
+      }
+      #ai-wrap {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .panel-bar {
+        background: #1c2128;
+        padding: 6px 14px;
+        font-size: 12px;
+        color: #8b949e;
+        border-bottom: 1px solid #30363d;
+        flex-shrink: 0;
+      }
+      #console-output {
+        overflow-y: auto;
+        padding: 10px 14px;
+        min-height: 70px;
+        font-family: monospace;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      #ai-output {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px 14px;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #c9d1d9;
+        white-space: pre-wrap;
+      }
+      .console-line {
+        color: #7ee787;
+      }
+      .console-error {
+        color: #f85149;
+      }
+      .console-empty {
+        color: #484f58;
+      }
+      .ai-correct {
+        color: #7ee787;
+      }
+      .ai-hint {
+        color: #f0b429;
+      }
+      .ai-error {
+        color: #f85149;
+      }
+      #nav-bar {
+        background: #161b22;
+        border-top: 1px solid #30363d;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      #nav-bar span {
+        font-size: 12px;
+        color: #8b949e;
+      }
+      .btn-nav {
+        background: #21262d;
+        border: 1px solid #30363d;
+        color: #c9d1d9;
+        padding: 6px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .btn-nav:disabled {
+        color: #484f58;
+        cursor: not-allowed;
+      }
+      .btn-next {
+        background: #1f4e2a;
+        border-color: #238636;
+        color: #7ee787;
+        font-weight: 600;
+      }
+      .btn-next:disabled {
+        background: #21262d;
+        border-color: #30363d;
+        color: #484f58;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <h1>
+        🧠 JS Think <span class="badge">Aprende a pensar en JavaScript</span>
+      </h1>
+      <div id="progress-bar-wrap">
+        <span id="progress-text">0/12 completados</span>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="sidebar"></div>
+      <div id="content">
+        <div id="challenge-header">
+          <div id="challenge-level-badge"></div>
+          <div id="challenge-title"></div>
+          <div id="challenge-desc"></div>
+          <div id="hint-btns">
+            <button class="hint-btn" onclick="toggleHint()">
+              💡 Ver pista
+            </button>
+            <button class="hint-btn secondary" onclick="toggleExample()">
+              👁️ Ver ejemplo
+            </button>
+          </div>
+          <div id="hint-box"></div>
+          <div id="example-box"></div>
+        </div>
+        <div id="editor-area">
+          <div id="editor-wrap">
+            <div id="editor-bar">
+              <span>📝 Tu código</span>
+              <div id="editor-actions">
+                <button class="btn-run" onclick="runCode()">▶ Ejecutar</button>
+                <button class="btn-ai" onclick="getFeedback()">
+                  💬 Ver feedback
+                </button>
+              </div>
+            </div>
+            <textarea id="code-editor" spellcheck="false"></textarea>
+          </div>
+          <div id="right-panel">
+            <div id="console-wrap">
+              <div class="panel-bar">💻 Consola</div>
+              <div id="console-output">
+                <span class="console-empty"
+                  >Ejecuta tu código para ver el resultado...</span
+                >
+              </div>
+            </div>
+            <div id="ai-wrap">
+              <div class="panel-bar">💬 Feedback</div>
+              <div id="ai-output">
+                <span class="console-empty"
+                  >Ejecuta tu código y presiona "Ver feedback" para recibir
+                  orientación. 💬</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="nav-bar">
+          <button class="btn-nav" id="btn-prev" onclick="navigate(-1)">
+            ← Anterior
+          </button>
+          <span id="nav-info">Desafío 1 de 12</span>
+          <button class="btn-nav btn-next" id="btn-next" onclick="navigate(1)">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const CHALLENGES = [
+        {
+          id: 1,
+          level: "Variables & Tipos",
+          icon: "📦",
+          title: "Tu primera variable",
+          desc: "Crea una variable llamada <code>nombre</code> con tu nombre, y otra llamada <code>edad</code> con tu edad. Luego muéstralas con <code>console.log</code>.",
+          hint: "Usa `let` o `const` para declarar variables. Ej: `let ciudad = 'Santiago';`",
+          starter: "// Escribe tu código aquí\n\n",
+          example:
+            "let nombre = 'Ana';\nlet edad = 25;\nconsole.log(nombre);\nconsole.log(edad);",
+          validate: (o) => o.length >= 2,
+          feedbackOk:
+            '✅ ¡Perfecto! Creaste tus primeras variables.\n\n📖 ¿Qué aprendiste?\n• `let` y `const` son las formas modernas de declarar variables en JS.\n• Una variable es como una caja con nombre donde guardas información.\n• `console.log` te permite "ver" el contenido de esa caja.\n\n💡 Tip extra: usa `const` cuando el valor no va a cambiar, y `let` cuando sí puede cambiar.',
+          feedbackErr:
+            "🤔 Casi... algunas pistas:\n\n• ¿Declaraste DOS variables distintas? Necesitas una para `nombre` y otra para `edad`.\n• ¿Usaste `console.log` para mostrar CADA UNA?\n• Recuerda que los textos van entre comillas: `let nombre = 'Tu nombre'`\n• Los números NO llevan comillas: `let edad = 25`\n\n¡Inténtalo de nuevo! Vas por buen camino 💪",
+        },
+        {
+          id: 2,
+          level: "Variables & Tipos",
+          icon: "📦",
+          title: "Tipos de datos",
+          desc: "Crea 4 variables: un <code>string</code>, un <code>number</code>, un <code>boolean</code> y <code>null</code>. Muestra cada una y su tipo con <code>typeof</code>.",
+          hint: "`typeof` te dice el tipo de una variable. Ej: `console.log(typeof 42)` muestra 'number'",
+          starter: "// 4 tipos de datos\n\n",
+          example:
+            "let texto = 'Hola';\nlet numero = 42;\nlet activo = true;\nlet vacio = null;\nconsole.log(typeof texto);\nconsole.log(typeof numero);",
+          validate: (o) => o.length >= 4,
+          feedbackOk:
+            "✅ ¡Excelente! Dominaste los tipos de datos básicos.\n\n📖 ¿Qué aprendiste?\n• `string` → texto entre comillas ('hola', \"mundo\")\n• `number` → números (42, 3.14)\n• `boolean` → solo true o false\n• `null` → ausencia intencional de valor\n\n⚠️ Curiosidad: `typeof null` devuelve 'object'. Es un bug famoso de JavaScript que existe desde 1995 y nunca se corrigió para no romper sitios web antiguos.",
+          feedbackErr:
+            "🤔 Necesitas al menos 4 líneas de salida en consola.\n\n• ¿Creaste los 4 tipos? string, number, boolean y null\n• ¿Usaste `typeof` para mostrar el tipo de cada una?\n• Ej: `console.log(typeof miVariable)`\n\n¡Revisa que tengas 4 variables y al menos 4 console.log! 💪",
+        },
+        {
+          id: 3,
+          level: "Condicionales",
+          icon: "🔀",
+          title: "Mayor de edad",
+          desc: "Crea una variable <code>edad</code>. Usa <code>if/else</code> para mostrar 'Mayor de edad' si es 18 o más, o 'Menor de edad' si es menos.",
+          hint: "La estructura es: `if (condicion) { ... } else { ... }`",
+          starter: "let edad = 20;\n\n// Tu condicional aquí\n",
+          example:
+            "let edad = 20;\nif (edad >= 18) {\n  console.log('Mayor de edad');\n} else {\n  console.log('Menor de edad');\n}",
+          validate: (o) =>
+            o.some((l) => l.includes("Mayor") || l.includes("Menor")),
+          feedbackOk:
+            "✅ ¡Muy bien! Tu primer condicional funciona perfectamente.\n\n📖 ¿Qué aprendiste?\n• `if` ejecuta un bloque de código solo si la condición es verdadera.\n• `else` es el camino alternativo cuando la condición es falsa.\n• `>=` significa 'mayor o igual que'.\n\n💡 Tip: prueba cambiando el valor de `edad` a 15 y vuelve a ejecutar. ¡El programa toma decisiones solo!",
+          feedbackErr:
+            "🤔 La salida no muestra 'Mayor de edad' ni 'Menor de edad'.\n\n• ¿Escribiste `if (edad >= 18)` con las llaves `{ }`?\n• ¿El texto del console.log dice exactamente 'Mayor de edad' o 'Menor de edad'?\n• ¿Tienes un `else` para el caso contrario?\n\nRevisa la estructura y vuelve a ejecutar 💪",
+        },
+        {
+          id: 4,
+          level: "Condicionales",
+          icon: "🔀",
+          title: "Semáforo lógico",
+          desc: "Crea una variable <code>color</code> con 'rojo', 'amarillo' o 'verde'. Usa <code>if/else if/else</code> para mostrar qué debe hacer un conductor.",
+          hint: "Puedes usar `===` para comparar strings. Ej: `if (color === 'rojo')`",
+          starter: "let color = 'rojo';\n\n// Tu lógica aquí\n",
+          example:
+            "let color = 'rojo';\nif (color === 'rojo') {\n  console.log('Detente');\n} else if (color === 'amarillo') {\n  console.log('Precaución');\n} else {\n  console.log('Avanza');\n}",
+          validate: (o) => o.length >= 1,
+          feedbackOk:
+            "✅ ¡Genial! Usaste `else if` para manejar múltiples casos.\n\n📖 ¿Qué aprendiste?\n• `else if` permite encadenar varias condiciones.\n• `===` compara valor Y tipo (es más estricto y seguro que `==`).\n• Un programa puede tomar decisiones complejas con estas estructuras.\n\n💡 Tip: prueba cambiando `color` a 'amarillo' o 'verde' y ejecuta de nuevo.",
+          feedbackErr:
+            "🤔 El programa no produjo salida o hay un error.\n\n• ¿Usaste `===` (triple igual) para comparar el color?\n• ¿El texto de `color` está en minúsculas? JS es sensible a mayúsculas: 'Rojo' ≠ 'rojo'\n• ¿Tienes las llaves `{ }` en cada bloque?\n\n¡Revisa la comparación y vuelve a intentarlo! 💪",
+        },
+        {
+          id: 5,
+          level: "Loops",
+          icon: "🔁",
+          title: "Contar hasta 10",
+          desc: "Usa un bucle <code>for</code> para mostrar los números del 1 al 10 en la consola.",
+          hint: "Un for tiene 3 partes: inicio, condición y paso. Ej: `for (let i = 0; i < 5; i++)`",
+          starter: "// Tu bucle for aquí\n\n",
+          example: "for (let i = 1; i <= 10; i++) {\n  console.log(i);\n}",
+          validate: (o) => o.length >= 10,
+          feedbackOk:
+            "✅ ¡Perfecto! Completaste tu primer bucle for.\n\n📖 ¿Qué aprendiste?\n• Un `for` tiene 3 partes separadas por `;`:\n  1. `let i = 1` → valor inicial\n  2. `i <= 10` → condición para continuar\n  3. `i++` → incremento en cada vuelta\n• Los bucles evitan repetir código: en vez de 10 console.log, usaste 1 sola línea.\n\n💡 Tip: `i++` es lo mismo que `i = i + 1`. ¡El bucle se detiene solo cuando la condición es falsa!",
+          feedbackErr:
+            "🤔 No aparecieron los 10 números. Algunas pistas:\n\n• ¿Tu `i` empieza en 1? → `let i = 1`\n• ¿La condición llega hasta 10? → `i <= 10`\n• ¿Incrementas `i` en cada vuelta? → `i++`\n• ¿Tienes el `console.log(i)` dentro de las llaves `{ }`?\n\nEstructura: `for (let i = 1; i <= 10; i++) { console.log(i); }` 💪",
+        },
+        {
+          id: 6,
+          level: "Loops",
+          icon: "🔁",
+          title: "Solo los pares",
+          desc: "Usa un bucle para mostrar solo los números pares del 1 al 20.",
+          hint: "Un número es par si `numero % 2 === 0`. El operador `%` da el resto de la división.",
+          starter: "// Muestra solo pares del 1 al 20\n\n",
+          example:
+            "for (let i = 1; i <= 20; i++) {\n  if (i % 2 === 0) {\n    console.log(i);\n  }\n}",
+          validate: (o) =>
+            o.length >= 10 && o.every((n) => Number(n) % 2 === 0),
+          feedbackOk:
+            "✅ ¡Excelente! Combinaste un bucle con un condicional.\n\n📖 ¿Qué aprendiste?\n• El operador `%` (módulo) devuelve el RESTO de una división.\n• `10 % 2 = 0` porque 10 se divide exactamente entre 2.\n• `7 % 2 = 1` porque sobra 1.\n• Puedes anidar `if` dentro de `for` para filtrar valores.\n\n💡 Desafío mental: ¿cómo mostrarías solo los múltiplos de 3?",
+          feedbackErr:
+            "🤔 Los números en consola no son todos pares, o faltan algunos.\n\n• ¿Usaste `%` para detectar pares? → `if (i % 2 === 0)`\n• ¿Tu bucle va del 1 al 20? → `i <= 20`\n• ¿El console.log está DENTRO del if?\n\nRecuerda: par significa que el resto de dividir entre 2 es cero 💪",
+        },
+        {
+          id: 7,
+          level: "Funciones",
+          icon: "⚙️",
+          title: "Tu primera función",
+          desc: "Crea una función <code>saludar</code> que reciba un nombre y muestre 'Hola, [nombre]!'. Llámala 3 veces con nombres distintos.",
+          hint: "Se define con `function nombre(param) { ... }` y se llama con `nombre('valor')`",
+          starter: "// Define tu función aquí\n\n\n// Llámala 3 veces\n",
+          example:
+            "function saludar(nombre) {\n  console.log('Hola, ' + nombre + '!');\n}\nsaludar('Ana');\nsaludar('Luis');\nsaludar('María');",
+          validate: (o) =>
+            o.length >= 3 && o.every((l) => l.startsWith("Hola")),
+          feedbackOk:
+            "✅ ¡Muy bien! Creaste y usaste tu primera función.\n\n📖 ¿Qué aprendiste?\n• Una función es un bloque de código reutilizable con nombre.\n• El `parámetro` es una variable local que recibe el valor al llamarla.\n• Llamar la función 3 veces con distintos nombres muestra el poder de la reutilización.\n\n💡 Tip: en vez de `'Hola, ' + nombre + '!'` puedes usar template literals: `` `Hola, ${nombre}!` `` (con backticks). ¡Es más moderno y legible!",
+          feedbackErr:
+            "🤔 Las 3 salidas no empiezan con 'Hola'. Pistas:\n\n• ¿Definiste la función con `function saludar(nombre) { ... }`?\n• ¿El console.log construye el texto con el parámetro? Ej: `'Hola, ' + nombre + '!'`\n• ¿Llamaste la función 3 veces con nombres distintos?\n• ¿Los nombres van entre comillas al llamarla? → `saludar('Ana')`\n\n¡Revisa y vuelve a intentarlo! 💪",
+        },
+        {
+          id: 8,
+          level: "Funciones",
+          icon: "⚙️",
+          title: "Calculadora básica",
+          desc: "Crea una función <code>calcular(a, b, operacion)</code> que haga suma, resta, multiplicación o división. Pruébala con distintos valores.",
+          hint: "Puedes usar if/else o switch dentro de la función para elegir la operación.",
+          starter:
+            "function calcular(a, b, operacion) {\n  // Tu lógica aquí\n}\n\n// Prueba tu función\n",
+          example:
+            "function calcular(a, b, op) {\n  if (op === 'suma') return a + b;\n  if (op === 'resta') return a - b;\n  if (op === 'mult') return a * b;\n  if (op === 'div') return a / b;\n}\nconsole.log(calcular(10, 5, 'suma'));\nconsole.log(calcular(10, 5, 'resta'));",
+          validate: (o) => o.length >= 2,
+          feedbackOk:
+            "✅ ¡Genial! Tu función recibe parámetros y toma decisiones.\n\n📖 ¿Qué aprendiste?\n• Una función puede recibir MÚLTIPLES parámetros.\n• `return` devuelve un valor para que puedas usarlo (con console.log, guardarlo en variable, etc).\n• Combinar funciones con condicionales es la base de cualquier programa real.\n\n💡 Tip extra: prueba `calcular(10, 0, 'div')`. ¿Qué pasa? ¿Cómo agregarías una validación para ese caso?",
+          feedbackErr:
+            "🤔 La función no produjo resultados. Algunas pistas:\n\n• ¿Tu función tiene `return` para devolver el resultado?\n• ¿Llamaste la función con `console.log(calcular(...))`?\n• ¿Pasaste los 3 argumentos? → `calcular(10, 5, 'suma')`\n• ¿Comparas el parámetro operacion con `===`?\n\n¡Recuerda: definir la función no la ejecuta, hay que llamarla! 💪",
+        },
+        {
+          id: 9,
+          level: "Arrays",
+          icon: "📋",
+          title: "Mi primera lista",
+          desc: "Crea un array con 5 frutas. Muestra la primera, la última y la cantidad total de elementos.",
+          hint: "Los arrays empiezan en índice 0. El último es `array[array.length - 1]`",
+          starter: "let frutas = [];\n\n// Muestra primera, última y total\n",
+          example:
+            "let frutas = ['manzana','pera','uva','mango','kiwi'];\nconsole.log(frutas[0]);\nconsole.log(frutas[frutas.length - 1]);\nconsole.log(frutas.length);",
+          validate: (o) => o.length >= 3,
+          feedbackOk:
+            "✅ ¡Perfecto! Ya sabes trabajar con arrays.\n\n📖 ¿Qué aprendiste?\n• Un array es una lista ordenada de valores entre corchetes `[ ]`.\n• Los índices empiezan en 0: el primer elemento es `[0]`, el segundo `[1]`, etc.\n• `.length` te da el total de elementos.\n• `array[array.length - 1]` siempre accede al último, sin importar cuántos haya.\n\n💡 Tip: los arrays pueden guardar cualquier tipo de dato, ¡incluso mezclarlos!",
+          feedbackErr:
+            "🤔 Faltan algunos datos en la consola. Pistas:\n\n• ¿Tu array tiene 5 elementos? → `['a','b','c','d','e']`\n• ¿Mostraste el primero con `frutas[0]`?\n• ¿Mostraste el último con `frutas[frutas.length - 1]`?\n• ¿Mostraste el total con `frutas.length`?\n\nNecesitas al menos 3 console.log 💪",
+        },
+        {
+          id: 10,
+          level: "Arrays",
+          icon: "📋",
+          title: "Recorre y transforma",
+          desc: "Dado el array <code>[1, 2, 3, 4, 5]</code>, usa <code>.map()</code> para crear un nuevo array con cada número multiplicado por 2.",
+          hint: "`.map()` transforma cada elemento: `array.map(n => n * 2)` multiplica cada número por 2.",
+          starter:
+            "let numeros = [1, 2, 3, 4, 5];\n\n// Usa .map() para duplicar cada número\n",
+          example:
+            "let numeros = [1, 2, 3, 4, 5];\nlet dobles = numeros.map(n => n * 2);\nconsole.log(dobles);",
+          validate: (o) =>
+            o.some(
+              (l) => l.includes("2") && l.includes("4") && l.includes("10"),
+            ),
+          feedbackOk:
+            "✅ ¡Excelente! Usaste uno de los métodos más poderosos de los arrays.\n\n📖 ¿Qué aprendiste?\n• `.map()` crea un NUEVO array aplicando una función a cada elemento.\n• `n => n * 2` es una 'arrow function' (función flecha), una forma corta de escribir funciones.\n• El array original `numeros` NO se modifica, `.map()` devuelve uno nuevo.\n\n💡 Tip: otros métodos útiles son `.filter()` (filtrar elementos) y `.reduce()` (acumular valores). ¡Los verás pronto!",
+          feedbackErr:
+            "🤔 El resultado no muestra los números duplicados correctamente.\n\n• ¿Usaste `.map()` sobre el array? → `numeros.map(...)`\n• ¿La función multiplica por 2? → `n => n * 2`\n• ¿Mostraste el resultado con console.log?\n• El resultado debería ser [2, 4, 6, 8, 10]\n\n¡Prueba: `console.log(numeros.map(n => n * 2))` 💪",
+        },
+        {
+          id: 11,
+          level: "Objetos",
+          icon: "🗂️",
+          title: "Tu perfil en código",
+          desc: "Crea un objeto <code>perfil</code> con: nombre, edad, ciudad, y un array de hobbies. Muestra cada propiedad.",
+          hint: "Los objetos se crean con llaves: `{ clave: valor }`. Se accede con `objeto.propiedad`",
+          starter:
+            "let perfil = {\n  // tus propiedades aquí\n};\n\n// Muestra cada propiedad\n",
+          example:
+            "let perfil = {\n  nombre: 'Ana',\n  edad: 25,\n  ciudad: 'Santiago',\n  hobbies: ['leer', 'correr']\n};\nconsole.log(perfil.nombre);\nconsole.log(perfil.hobbies);",
+          validate: (o) => o.length >= 3,
+          feedbackOk:
+            "✅ ¡Muy bien! Creaste tu primer objeto en JavaScript.\n\n📖 ¿Qué aprendiste?\n• Un objeto agrupa datos relacionados bajo un mismo nombre.\n• Cada par `clave: valor` es una propiedad del objeto.\n• Se accede con punto: `objeto.propiedad`.\n• Un objeto puede contener arrays, números, strings, ¡y hasta otros objetos!\n\n💡 Tip: los objetos son la base de casi todo en JS. Un usuario, un producto, una canción... todo se representa como objeto.",
+          feedbackErr:
+            "🤔 Faltan propiedades en la salida. Pistas:\n\n• ¿Tu objeto tiene las 4 propiedades? (nombre, edad, ciudad, hobbies)\n• ¿Los hobbies son un array? → `hobbies: ['cosa1', 'cosa2']`\n• ¿Accedes con punto? → `perfil.nombre`, `perfil.edad`\n• ¿Tienes al menos 3 console.log?\n\n¡Revisa que el objeto no esté vacío y que lo estés mostrando! 💪",
+        },
+        {
+          id: 12,
+          level: "Objetos",
+          icon: "🗂️",
+          title: "Mini proyecto: Tareas",
+          desc: "Crea un array de objetos (tareas con <code>titulo</code> y <code>completada</code>). Usa <code>.filter()</code> para mostrar solo las tareas completadas.",
+          hint: "`.filter()` devuelve elementos que pasan la condición: `tareas.filter(t => t.completada)`",
+          starter:
+            "let tareas = [\n  // al menos 4 tareas\n];\n\n// Filtra las completadas\n",
+          example:
+            "let tareas = [\n  { titulo: 'Estudiar JS', completada: true },\n  { titulo: 'Hacer ejercicio', completada: false },\n  { titulo: 'Leer', completada: true }\n];\nlet hechas = tareas.filter(t => t.completada);\nconsole.log(hechas);",
+          validate: (o) => o.length >= 1,
+          feedbackOk:
+            "✅ ¡Felicitaciones! Terminaste todos los desafíos base. 🎉\n\n📖 ¿Qué aprendiste?\n• Un array de objetos es una de las estructuras más comunes en programación real.\n• `.filter()` recorre el array y devuelve solo los elementos que cumplen la condición.\n• `t => t.completada` es una arrow function que devuelve true/false por cada tarea.\n\n🚀 ¿Qué sigue?\n• Aprende sobre el DOM (manipular páginas web con JS)\n• Practica con proyectos pequeños reales\n• ¡Cuando te sientas listo, empieza con React!",
+          feedbackErr:
+            "🤔 Casi llegas al final. Algunas pistas:\n\n• ¿Tu array tiene al menos 4 objetos con `titulo` y `completada`?\n• ¿Algunas tareas tienen `completada: true` y otras `completada: false`?\n• ¿Usaste `.filter()` para filtrar? → `tareas.filter(t => t.completada)`\n• ¿Mostraste el resultado con console.log?\n\n¡Estás muy cerca del final! 💪",
+        },
+      ];
+
+      const LEVELS = [
+        "Variables & Tipos",
+        "Condicionales",
+        "Loops",
+        "Funciones",
+        "Arrays",
+        "Objetos",
+      ];
+
+      let currentIdx = 0;
+      let completed = new Set();
+      let showHint = false;
+      let showExample = false;
+      let lastLogs = [];
+      let lastError = null;
+
+      function renderAll() {
+        renderSidebar();
+        renderChallenge();
+        renderNav();
+        renderProgress();
+      }
+
+      function renderSidebar() {
+        const sb = document.getElementById("sidebar");
+        sb.innerHTML = "";
+        LEVELS.forEach((lvl) => {
+          const label = document.createElement("div");
+          label.className = "level-label";
+          label.textContent =
+            (CHALLENGES.find((c) => c.level === lvl)?.icon || "") + " " + lvl;
+          sb.appendChild(label);
+          CHALLENGES.filter((c) => c.level === lvl).forEach((c) => {
+            const idx = CHALLENGES.indexOf(c);
+            const div = document.createElement("div");
+            div.className =
+              "challenge-item" +
+              (idx === currentIdx ? " active" : "") +
+              (completed.has(c.id) ? " done" : "");
+            div.textContent =
+              (completed.has(c.id) ? "✅" : idx === currentIdx ? "▶" : "○") +
+              " " +
+              c.title;
+            div.title = c.title;
+            div.onclick = () => {
+              currentIdx = idx;
+              showHint = false;
+              showExample = false;
+              lastLogs = [];
+              lastError = null;
+              renderAll();
+            };
+            sb.appendChild(div);
+          });
+        });
+      }
+
+      function renderChallenge() {
+        const c = CHALLENGES[currentIdx];
+        document.getElementById("challenge-level-badge").textContent =
+          c.icon + " " + c.level;
+        document.getElementById("challenge-title").textContent = c.title;
+        document.getElementById("challenge-desc").innerHTML = c.desc;
+        const hintBox = document.getElementById("hint-box");
+        hintBox.textContent = "💡 " + c.hint;
+        hintBox.style.display = showHint ? "block" : "none";
+        const exBox = document.getElementById("example-box");
+        exBox.textContent = c.example;
+        exBox.style.display = showExample ? "block" : "none";
+        const editor = document.getElementById("code-editor");
+        if (editor.dataset.challengeId !== String(c.id)) {
+          editor.value = c.starter;
+          editor.dataset.challengeId = c.id;
+          document.getElementById("console-output").innerHTML =
+            '<span class="console-empty">Ejecuta tu código para ver el resultado...</span>';
+          document.getElementById("ai-output").innerHTML =
+            '<span class="console-empty">Ejecuta tu código y presiona "Ver feedback". 💬</span>';
+        }
+      }
+
+      function renderNav() {
+        document.getElementById("btn-prev").disabled = currentIdx === 0;
+        document.getElementById("btn-next").disabled =
+          currentIdx === CHALLENGES.length - 1;
+        document.getElementById("nav-info").textContent =
+          `Desafío ${currentIdx + 1} de ${CHALLENGES.length}`;
+      }
+
+      function renderProgress() {
+        const count = completed.size;
+        document.getElementById("progress-text").textContent =
+          `${count}/${CHALLENGES.length} completados`;
+        document.getElementById("progress-fill").style.width =
+          Math.round((count / CHALLENGES.length) * 100) + "%";
+      }
+
+      function toggleHint() {
+        showHint = !showHint;
+        showExample = false;
+        renderChallenge();
+      }
+      function toggleExample() {
+        showExample = !showExample;
+        showHint = false;
+        renderChallenge();
+      }
+      function navigate(dir) {
+        const n = currentIdx + dir;
+        if (n < 0 || n >= CHALLENGES.length) return;
+        currentIdx = n;
+        showHint = false;
+        showExample = false;
+        lastLogs = [];
+        lastError = null;
+        renderAll();
+      }
+
+      function runCode() {
+        const code = document.getElementById("code-editor").value;
+        const logs = [];
+        const mock = {
+          log: (...args) =>
+            logs.push(
+              args
+                .map((a) =>
+                  typeof a === "object" ? JSON.stringify(a) : String(a),
+                )
+                .join(" "),
+            ),
+        };
+        const out = document.getElementById("console-output");
+        try {
+          new Function("console", code)(mock);
+          lastLogs = logs;
+          lastError = null;
+          out.innerHTML = logs.length
+            ? logs.map((l) => `<div class="console-line">→ ${l}</div>`).join("")
+            : '<span class="console-empty">Sin salida. ¿Pusiste console.log?</span>';
+        } catch (e) {
+          lastError = e.message;
+          lastLogs = [];
+          out.innerHTML = `<div class="console-error">❌ ${e.message}</div>`;
+        }
+      }
+
+      function getFeedback() {
+        runCode();
+        const c = CHALLENGES[currentIdx];
+        const out = document.getElementById("ai-output");
+        if (lastError) {
+          out.innerHTML = `<span class="ai-error">❌ Tu código tiene un error de sintaxis:\n\n${lastError}\n\n💡 Tip: revisa que todas las llaves { } y paréntesis ( ) estén cerrados correctamente, y que las comillas de los strings estén completas.</span>`;
+          return;
+        }
+        const isCorrect = lastLogs.length > 0 && c.validate(lastLogs);
+        if (isCorrect) {
+          completed.add(c.id);
+          renderSidebar();
+          renderProgress();
+          out.innerHTML = `<span class="ai-correct">${c.feedbackOk}</span>`;
+        } else {
+          out.innerHTML = `<span class="ai-hint">${c.feedbackErr}</span>`;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document
+          .getElementById("code-editor")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Tab") {
+              e.preventDefault();
+              const el = e.target,
+                s = el.selectionStart,
+                end = el.selectionEnd;
+              el.value =
+                el.value.substring(0, s) + "  " + el.value.substring(end);
+              el.selectionStart = el.selectionEnd = s + 2;
+            }
+          });
+        renderAll();
+      });
+    </script>
+  </body>
+</html>
