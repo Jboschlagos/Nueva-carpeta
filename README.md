@@ -6,7 +6,8 @@ Una app interactiva para aprender JavaScript desde cero, enfocada en desarrollar
 
 - 12 desafíos progresivos organizados en 6 niveles
 - Editor de código con consola integrada
-- Feedback inteligente por desafío: te guía sin darte la respuesta directa
+- Feedback con IA real usando **Google Gemini** (gratis, sin tarjeta de crédito)
+- Modo sin IA con feedback pregrabado por desafío
 - Seguimiento de progreso visual
 - Pistas y ejemplos disponibles cuando los necesitas
 - **Sin dependencias. Sin instalación. Un solo archivo HTML.**
@@ -26,7 +27,15 @@ Una app interactiva para aprender JavaScript desde cero, enfocada en desarrollar
 
 1. Descarga o clona este repositorio
 2. Abre `index.html` en tu navegador (Chrome recomendado)
-3. ¡Listo! No necesitas instalar nada
+3. Opcional: ingresa tu API key de Google Gemini para activar el feedback con IA
+4. ¡Listo! No necesitas instalar nada
+
+### Obtener API key de Gemini (gratis, sin tarjeta)
+
+1. Ve a [aistudio.google.com](https://aistudio.google.com)
+2. Inicia sesión con tu cuenta Google
+3. Clic en **"Get API key"** → **"Create API key"**
+4. Pega la key en la app al abrirla
 
 ```bash
 git clone https://github.com/tu-usuario/js-think.git
